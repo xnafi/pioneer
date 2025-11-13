@@ -45,12 +45,12 @@ export default function SignIn() {
       const result = await res.json();
 
       if (!res.ok) {
-        setToastMsg(result.message || "Login failed!");
+        setToastMsg(result.detail || "Login failed!");
         return;
       }
 
       // Save token
-      localStorage.setItem("auth_token", result.token);
+      localStorage.setItem("auth_token", result.access);
       setToastMsg("Login Successful!");
 
       setTimeout(() => {

@@ -58,7 +58,7 @@ export default function SignUp() {
       }
 
       // Save token
-      localStorage.setItem("auth_token", result.token);
+      localStorage.setItem("auth_token", result.access);
       setToastMsg("Login Successful!");
 
       setTimeout(() => {
