@@ -31,7 +31,7 @@ export default function SignIn() {
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
       const res = await fetch(
-        "https://todo-app.pioneeralpha.com/api/auth/login/",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -37,7 +37,7 @@ export default function SignUp() {
     setLoading(true);
     try {
       const res = await fetch(
-        "https://todo-app.pioneeralpha.com/api/users/signup/",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/signup/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
