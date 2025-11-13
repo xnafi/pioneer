@@ -15,7 +15,7 @@ export const signUpSchema = z.object({
     .email("Please enter a valid email format."),
   password: z
     .string()
-    .min(4, "Password must be at least 4 characters."),
+    .min(6, "Password must be at least 6 characters."),
   confirmPassword: z
     .string()
     .min(1, "Confirm Password is required."),

@@ -3,11 +3,17 @@
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import login from "../../assets/signIn.svg";
+import login from "../../../assets/signIn.svg";
 import { IFormInput, loginSchema } from "@/schemas/signInSchema";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Toast from "@/components/Toast";
 
 export default function SignIn() {
+  const router = useRouter();
+  const [toastMsg, setToastMsg] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -22,24 +28,47 @@ export default function SignIn() {
     mode: "onChange",
   });
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log(data);
-    alert("Login Successful!");
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    try {
+      const res = await fetch(
+        "https://todo-app.pioneeralpha.com/api/auth/login/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        setToastMsg(result.message || "Login failed!");
+        return;
+      }
+
+      // Save token
+      localStorage.setItem("auth_token", result.token);
+      setToastMsg("Login Successful!");
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1200);
+    } catch (error) {
+      console.error(error);
+      setToastMsg("Something went wrong!");
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row container">
+      {/* show toast message */}
+      {toastMsg && <Toast message={toastMsg} />}
       {/* Left Section - Illustration */}
-      <div className="w-full md:w-[600px] bg-secondary items-center justify-center mx-auto flex">
-        <div className="w-full">
-          <Image
-            src={login}
-            alt="Login Illustration"
-            width={663}
-            height={414}
-            className="object-cover"
-          />
-        </div>
+      <div className="w-full md:w-[800px] bg-secondary items-center justify-center flex">
+        <Image src={login} alt="Login Illustration" width={800} height={600} />
       </div>
 
       {/* Right Section - Login Form */}
