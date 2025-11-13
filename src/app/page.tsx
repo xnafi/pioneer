@@ -1,7 +1,10 @@
-import LoginPage from '../components/LoginPage';
+import SignIn from "./sign-in/page";
+
 
 export default function Home() {
   return (
-    <LoginPage />
+    <main>
+      <SignIn />
+    </main>
   );
 }

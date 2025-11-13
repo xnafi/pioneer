@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, IFormInput } from "../types/auth";
-import login from "../assets/login.png";
+import login from "../../assets/signIn.svg";
+import { IFormInput, loginSchema } from "@/schemas/signInSchema";
+import Link from "next/link";
 
-const LoginPage = () => {
+export default function SignIn() {
   const {
     register,
     handleSubmit,
@@ -18,17 +19,18 @@ const LoginPage = () => {
       password: "",
       rememberMe: false,
     },
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     console.log(data);
-    // Handle login logic here
+    alert("Login Successful!");
   };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row container">
       {/* Left Section - Illustration */}
-      <div className="lg:flex w-full md:w-[800px] bg-secondary items-center justify-center">
+      <div className="w-full md:w-[600px] bg-secondary items-center justify-center mx-auto flex">
         <div className="w-full">
           <Image
             src={login}
@@ -51,10 +53,11 @@ const LoginPage = () => {
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            {/* Email */}
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 placeholder-[#8CA3CD]"
+                className="block text-sm font-medium text-gray-700"
               >
                 Email
               </label>
@@ -64,7 +67,7 @@ const LoginPage = () => {
                   type="email"
                   autoComplete="email"
                   {...register("email")}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border placeholder-[#8CA3CD] border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Enter your email"
                 />
                 {errors.email && (
@@ -75,6 +78,7 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Password */}
             <div>
               <label
                 htmlFor="password"
@@ -88,7 +92,7 @@ const LoginPage = () => {
                   type="password"
                   autoComplete="current-password"
                   {...register("password")}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-[#8CA3CD] focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border placeholder-[#8CA3CD] border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Enter your password"
                 />
                 {errors.password && (
@@ -99,13 +103,14 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Remember Me + Forgot */}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input
                   id="remember-me"
                   type="checkbox"
                   {...register("rememberMe")}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded placeholder-[#8CA3CD]"
                 />
                 <label
                   htmlFor="remember-me"
@@ -125,6 +130,7 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"
@@ -135,22 +141,21 @@ const LoginPage = () => {
             </div>
           </form>
 
+          {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-sm ">
               Don't have an account?
-              <a
-                href="#"
+              <Link
+                href="/sign-up"
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
                 {" "}
                 Register now
-              </a>
+              </Link>
             </p>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}
