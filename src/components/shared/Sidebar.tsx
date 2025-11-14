@@ -8,10 +8,10 @@ import userIcon from "../../assets/user-icon.png";
 import logoutIcon from "../../assets/logout-icon.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserInfo } from "@/types/types";
+import { User } from "@/types/types";
 
 export default function Sidebar() {
-  const [user, setUser] = useState<UserInfo | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {

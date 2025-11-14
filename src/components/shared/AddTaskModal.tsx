@@ -5,16 +5,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { addTaskSchema, AddTaskFormValues } from "../../schemas/addTaskSchema";
 import deleteIcon from "../../assets/delete.svg";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import Toast from "@/components/Toast";
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onTaskAdded: () => void;
 }
 
-const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
-  const router = useRouter();
+const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onTaskAdded }) => {
    const [toastMsg, setToastMsg] = useState("");
   const {
     control,
@@ -56,11 +55,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
       }
       setToastMsg("Task created successfully!");
       reset();
-      // after 2 sec navigate to dashboard
-      setTimeout(() => {
-        onClose();
-        router.push("/dashboard/todos");
-      }, 2000); 
+      onTaskAdded();
     } catch (error) {
       console.error(error);
       setToastMsg("Something went wrong!");

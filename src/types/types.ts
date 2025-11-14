@@ -1,8 +1,9 @@
 export interface User {
   id: string;
   email: string;
-  name: string;
-  image: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string;
 }
 
 export interface Todo {

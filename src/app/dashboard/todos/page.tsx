@@ -17,7 +17,6 @@ export default function TodosPage() {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-
   // Fetch Todos from API
   const fetchTodos = async () => {
     try {
@@ -28,7 +27,7 @@ export default function TodosPage() {
         return;
       }
 
-      const res = await fetch("https://todo-app.pioneeralpha.com/api/todos/", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/todos/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -37,7 +36,6 @@ export default function TodosPage() {
 
       const data = await res.json();
       setTodos(data.results);
-      console.log("📌 TODOS FETCHED:", data.results); // ⬅️ console log result
     } catch (error) {
       console.error("❌ Error fetching todos:", error);
     }
@@ -122,16 +120,19 @@ export default function TodosPage() {
 
       {/* Todo Cards */}
       {todos.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {todos.map((todo) => (
-            <TodoCard
-              key={todo.id}
-              title={todo.title}
-              description={todo.description}
-              todo_date={todo.todo_date}
-              priority={todo.priority}
-            />
-          ))}
+        <div className="space-y-3 flex flex-col">
+          <span className="font-semibold text-lg">Your Tasks</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {todos.map((todo) => (
+              <TodoCard
+                key={todo.id}
+                title={todo.title}
+                description={todo.description}
+                todo_date={todo.todo_date}
+                priority={todo.priority}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
@@ -146,7 +147,7 @@ export default function TodosPage() {
         </div>
       )}
 
-      <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} />
+      <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} onTaskAdded={fetchTodos} />
     </div>
   );
 }
