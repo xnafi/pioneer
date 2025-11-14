@@ -1,5 +1,6 @@
-import AccountInformation from "./Account-Information/AccountInformation";
+import AccountSetting from "./Account-Information/AccountSetting";
+
 
 export default function Dashboard() {
-  return <AccountInformation />;
+  return <AccountSetting />;
 }
