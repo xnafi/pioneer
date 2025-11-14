@@ -56,6 +56,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onTaskAdde
       setToastMsg("Task created successfully!");
       reset();
       onTaskAdded();
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } catch (error) {
       console.error(error);
       setToastMsg("Something went wrong!");

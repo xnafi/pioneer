@@ -7,15 +7,24 @@ import todoEmptyState from "../../../assets/add-todo.svg";
 import searchIcon from "../../../assets/SearchIcon.svg";
 import AddTaskModal from "../../../components/shared/AddTaskModal";
 import TodoCard from "../../../components/shared/TodoCard";
+import Toast from "../../../components/Toast";
 import { Todo } from "../../../types/types";
 
 export default function TodosPage() {
   const [showFilter, setShowFilter] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+  };
 
   // Fetch Todos from API
   const fetchTodos = async () => {
@@ -38,6 +47,34 @@ export default function TodosPage() {
       setTodos(data.results);
     } catch (error) {
       console.error("❌ Error fetching todos:", error);
+    }
+  };
+
+  // Delete Todo
+  const handleDeleteTodo = async (id: number) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+
+      if (!token) {
+        console.log("User not authenticated");
+        return;
+      }
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/todos/${id}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        setTodos(todos.filter((todo) => todo.id !== id));
+        showToast("Todo deleted successfully!");
+      } else {
+        showToast(`❌ Error deleting todo: ${res.statusText}`);
+      }
+    } catch (error) {
+      showToast(`❌ Error deleting todo: ${error}`);
     }
   };
 
@@ -126,10 +163,12 @@ export default function TodosPage() {
             {todos.map((todo) => (
               <TodoCard
                 key={todo.id}
+                id={todo.id}
                 title={todo.title}
                 description={todo.description}
                 todo_date={todo.todo_date}
                 priority={todo.priority}
+                onDelete={handleDeleteTodo}
               />
             ))}
           </div>
@@ -148,6 +187,7 @@ export default function TodosPage() {
       )}
 
       <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} onTaskAdded={fetchTodos} />
+      {toastMessage && <Toast message={toastMessage} />}
     </div>
   );
 }

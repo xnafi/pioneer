@@ -7,7 +7,7 @@ export interface User {
 }
 
 export interface Todo {
-  id: string;
+  id: number;
   title: string;
   description: string;
   todo_date: string;

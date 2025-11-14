@@ -7,6 +7,7 @@ export const accountInformationSchema = z.object({
   bio: z.string().optional(),
   contact_number: z.string().optional(),
   birthday: z.string().optional(),
+  profile_image: z.string().optional(),
 });
 
 export type AccountInformationSchema = z.infer<typeof accountInformationSchema>;
