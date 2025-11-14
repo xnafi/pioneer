@@ -70,7 +70,7 @@ export default function AccountSetting() {
       }
 
       const res = await fetch(
-        "https://todo-app.pioneeralpha.com/api/users/me/",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/me/`,
         {
           method: "PUT",
           headers: {
