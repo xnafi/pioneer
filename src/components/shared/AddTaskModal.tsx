@@ -1,10 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addTaskSchema, AddTaskFormValues } from "../../schemas/addTaskSchema";
-import deleteIcon from '../../assets/delete.svg';
+import deleteIcon from "../../assets/delete.svg";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Toast from "@/components/Toast";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -12,6 +14,8 @@ interface AddTaskModalProps {
 }
 
 const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
+  const router = useRouter();
+   const [toastMsg, setToastMsg] = useState("");
   const {
     control,
     handleSubmit,
@@ -23,21 +27,52 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
       title: "",
       todo_date: "",
       priority: undefined,
+      description: "",
     },
   });
 
-  const onSubmit = (data: AddTaskFormValues) => {
-    console.log(data);
-    // Handle task submission logic here
-    reset();
-    onClose();
+  // ✅ Send data to API
+  const onSubmit = async (data: AddTaskFormValues) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+          setToastMsg("User not authenticated!");
+        return;
+      }
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/todos/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        setToastMsg(result.message || "Failed to add task");
+        return;
+      }
+      setToastMsg("Task created successfully!");
+      reset();
+      // after 2 sec navigate to dashboard
+      setTimeout(() => {
+        onClose();
+        router.push("/dashboard/todos");
+      }, 2000); 
+    } catch (error) {
+      console.error(error);
+      setToastMsg("Something went wrong!");
+    }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 bg-opacity-50 flex justify-center items-center z-50 ">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-[519px]">
+    <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 w-full h-full">
+       {toastMsg && <Toast message={toastMsg} />}
+      <div className="bg-white p-8 rounded-lg shadow-xl w-[519px] max-h-[90%] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold mb-2">Add New Task</h1>
@@ -53,13 +88,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {/* TITLE */}
           <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Title
-            </label>
+            <label className="block text-sm font-medium mb-1">Title</label>
             <Controller
               name="title"
               control={control}
@@ -67,8 +98,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                 <input
                   {...field}
                   type="text"
-                  id="title"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               )}
             />
@@ -79,13 +109,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
 
+          {/* DATE */}
           <div>
-            <label
-              htmlFor="date"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Date
-            </label>
+            <label className="block text-sm font-medium mb-1">Date</label>
             <Controller
               name="todo_date"
               control={control}
@@ -93,8 +119,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                 <input
                   {...field}
                   type="date"
-                  id="date"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               )}
             />
@@ -105,18 +130,16 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
 
+          {/* PRIORITY */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Priority
-            </label>
+            <label className="block text-sm font-medium mb-1">Priority</label>
+
             <div className="flex space-x-9 mt-2">
-              {["Extreme", "Moderate", "Low"].map((priorityOption) => (
-                <label
-                  key={priorityOption}
-                  className="flex items-center justify-center space-x-2"
-                >
+              {["extreme", "moderate", "low"].map((option) => (
+                <label key={option} className="flex items-center space-x-2">
                   <span className="bg-amber-700 rounded-md h-2 w-2 mt-1"></span>
-                  <span className="text-gray-700">{priorityOption}</span>
+                  <span>{option}</span>
+
                   <Controller
                     name="priority"
                     control={control}
@@ -124,16 +147,17 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
                       <input
                         {...field}
                         type="radio"
-                        value={priorityOption}
-                        checked={field.value === priorityOption}
-                        onChange={() => field.onChange(priorityOption)}
-                        className="form-radio h-4 w-4 text-[#4F46E5] mt-1"
+                        value={option}
+                        checked={field.value === option}
+                        onChange={() => field.onChange(option)}
+                        className="h-4 w-4 mt-1"
                       />
                     )}
                   />
                 </label>
               ))}
             </div>
+
             {errors.priority && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.priority.message}
@@ -141,26 +165,25 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
 
+          {/* DESCRIPTION */}
           <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label className="block text-sm font-medium mb-1">
               Task Description
             </label>
+
             <Controller
               name="description"
               control={control}
               render={({ field }) => (
                 <textarea
                   {...field}
-                  id="description"
                   rows={4}
-                  placeholder="Start writing here...."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
+                  placeholder="Start writing here..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 ></textarea>
               )}
             />
+
             {errors.description && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.description.message}
@@ -168,24 +191,26 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
 
-          <div className="flex justify-between space-x-4 mt-6">
+          {/* BUTTONS */}
+          <div className="flex justify-between mt-6">
             <button
               type="submit"
-              className="bg-primary text-white px-4 py-2 rounded-md flex items-center hover:bg-[#4F46E5]/90 cursor-pointer"
+              className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80"
             >
               Done
             </button>
+
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-white bg-red-500 cursor-pointer"
+              className="px-4 py-2 bg-red-500 text-white rounded-md flex items-center"
             >
               <Image
                 src={deleteIcon}
                 width={14}
                 height={12}
-                alt="Delete Icon"
-                className=" text-white rounded"
+                alt="Delete"
+                className="rounded"
               />
             </button>
           </div>
