@@ -5,9 +5,14 @@ import { FaPlus } from "react-icons/fa";
 import { LuSettings2 } from "react-icons/lu";
 import todoEmptyState from "../../../assets/add-todo.svg";
 import searchIcon from "../../../assets/SearchIcon.svg";
+import AddTaskModal from "../../../components/shared/AddTaskModal";
 
 export default function TodosPage() {
   const [showFilter, setShowFilter] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md min-h-full">
@@ -18,7 +23,7 @@ export default function TodosPage() {
           <span className="border-t-3 border-[#5272FF] block mb-6 w-1/2"></span>
         </div>
         {/* <h1 className="text-3xl font-bold text-[#1A2C50]">Todos</h1> */}
-        <button className="bg-primary text-white px-4 py-2 rounded-md flex items-center">
+        <button onClick={handleOpenModal} className="bg-primary text-white px-4 py-2 rounded-md flex items-center">
           <FaPlus className="mr-2" /> New Task
         </button>
       </div>
@@ -84,6 +89,8 @@ export default function TodosPage() {
         />
         <p className="text-gray-500 text-lg">No todos yet</p>
       </div>
+
+      <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 }
