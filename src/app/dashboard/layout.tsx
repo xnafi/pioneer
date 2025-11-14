@@ -7,6 +7,7 @@ import todoIcon from "../../assets/todo-icon.png";
 import userIcon from "../../assets/user-icon.png";
 import logoutIcon from "../../assets/logout-icon.png";
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // Import usePathname
 import DashboardNav from "@/components/shared/DashboardNav";
 
 interface UserInfo {
@@ -71,13 +72,14 @@ export default function DashboardLayout({
 
   const userName = user ? `${user.first_name} ${user.last_name}` : "Loading...";
   const userEmail = user?.email || "Loading...";
+  const pathname = usePathname(); // Initialize usePathname
 
   return (
     <html lang="en">
       <body>
         <div className="flex h-screen bg-gray-100">
           {/* Sidebar */}
-          <aside className="w-[340px] dark-bg text-white flex flex-col">
+          <aside className="w-[280px] bg-[#1A2C50] text-white flex flex-col">
             <div className="p-4">
               <div className="flex flex-col items-center mb-4 justify-center text-center mt-14">
                 <Image
@@ -88,9 +90,9 @@ export default function DashboardLayout({
                   className="rounded-full"
                 />
 
-                <div>
+                <div className="mt-4">
                   <h2 className="text-lg font-semibold">{userName}</h2>
-                  <p className="text-sm">{userEmail}</p>
+                  <p className="text-sm text-gray-400">{userEmail}</p>
                 </div>
               </div>
             </div>
@@ -98,7 +100,9 @@ export default function DashboardLayout({
             <nav className="flex-1 p-4 space-y-2">
               <Link
                 href="/dashboard"
-                className="flex items-center px-4 py-2 rounded-md hover:bg-blue-800"
+                className={`flex items-center px-4 py-2 rounded-md ${
+                  pathname === "/dashboard" ? "bg-[#2C426F]" : "hover:bg-[#2C426F]"
+                }`}
               >
                 <Image
                   src={dashboardIcon}
@@ -112,7 +116,9 @@ export default function DashboardLayout({
 
               <Link
                 href="/dashboard/todos"
-                className="flex items-center px-4 py-2 rounded-md hover:bg-blue-800"
+                className={`flex items-center px-4 py-2 rounded-md ${
+                  pathname === "/dashboard/todos" ? "bg-[#2C426F]" : "hover:bg-[#2C426F]"
+                }`}
               >
                 <Image
                   src={todoIcon}
@@ -126,7 +132,9 @@ export default function DashboardLayout({
 
               <Link
                 href="/dashboard/account"
-                className="flex items-center px-4 py-2 rounded-md bg-blue-800"
+                className={`flex items-center px-4 py-2 rounded-md ${
+                  pathname === "/dashboard/account" ? "bg-[#2C426F]" : "hover:bg-[#2C426F]"
+                }`}
               >
                 <Image
                   src={userIcon}
@@ -139,10 +147,10 @@ export default function DashboardLayout({
               </Link>
             </nav>
 
-            <div className="p-4 border-t border-blue-800">
+            <div className="p-4 border-t border-[#2C426F]">
               <button
                 onClick={handleLogout}
-                className="flex items-center px-4 py-2 rounded-md hover:bg-blue-800 w-full text-left"
+                className="flex items-center px-4 py-2 rounded-md hover:bg-[#2C426F] w-full text-left"
               >
                 <Image
                   src={logoutIcon}

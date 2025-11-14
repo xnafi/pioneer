@@ -101,7 +101,8 @@ export default function AccountSetting() {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold mb-6">Account Information</h1>
+      <h1 className="text-4xl font-bold mb-2">Account Information</h1>
+      <span className="border-t-2 border-[#5272FF] block mb-6 w-1/5"></span>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Profile Upload */}
