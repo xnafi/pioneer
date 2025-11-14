@@ -13,8 +13,12 @@ interface AddTaskModalProps {
   onTaskAdded: () => void;
 }
 
-const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onTaskAdded }) => {
-   const [toastMsg, setToastMsg] = useState("");
+const AddTaskModal: React.FC<AddTaskModalProps> = ({
+  isOpen,
+  onClose,
+  onTaskAdded,
+}) => {
+  const [toastMsg, setToastMsg] = useState("");
   const {
     control,
     handleSubmit,
@@ -35,7 +39,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onTaskAdde
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-          setToastMsg("User not authenticated!");
+        setToastMsg("User not authenticated!");
         return;
       }
 
@@ -56,7 +60,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onTaskAdde
       setToastMsg("Task created successfully!");
       reset();
       onTaskAdded();
+
       setTimeout(() => {
+        setToastMsg("");
         onClose();
       }, 2000);
     } catch (error) {
@@ -69,7 +75,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onTaskAdde
 
   return (
     <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 w-full h-full">
-       {toastMsg && <Toast message={toastMsg} />}
+      {toastMsg && <Toast message={toastMsg} />}
       <div className="bg-white p-8 rounded-lg shadow-xl w-[519px] max-h-[90%] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
