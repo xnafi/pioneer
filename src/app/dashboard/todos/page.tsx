@@ -1,18 +1,55 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
 import { LuSettings2 } from "react-icons/lu";
 import todoEmptyState from "../../../assets/add-todo.svg";
 import searchIcon from "../../../assets/SearchIcon.svg";
 import AddTaskModal from "../../../components/shared/AddTaskModal";
+import TodoCard from "../../../components/shared/TodoCard";
+import { Todo } from "../../../types/types";
 
 export default function TodosPage() {
   const [showFilter, setShowFilter] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [todos, setTodos] = useState<Todo[]>([]);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
+
+
+  // Fetch Todos from API
+  const fetchTodos = async () => {
+    try {
+      const token = localStorage.getItem("auth_token");
+
+      if (!token) {
+        console.log("User not authenticated");
+        return;
+      }
+
+      const res = await fetch("https://todo-app.pioneeralpha.com/api/todos/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      setTodos(data.results);
+      console.log("📌 TODOS FETCHED:", data.results); // ⬅️ console log result
+    } catch (error) {
+      console.error("❌ Error fetching todos:", error);
+    }
+  };
+
+  // Fetch on first load
+  useEffect(() => {
+    const loadTodos = async () => {
+      await fetchTodos();
+    };
+    loadTodos();
+  }, []);
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md min-h-full">
@@ -22,8 +59,11 @@ export default function TodosPage() {
           <h1 className="text-4xl font-bold mb-2">Todos</h1>
           <span className="border-t-3 border-[#5272FF] block mb-6 w-1/2"></span>
         </div>
-        {/* <h1 className="text-3xl font-bold text-[#1A2C50]">Todos</h1> */}
-        <button onClick={handleOpenModal} className="bg-primary text-white px-4 py-2 rounded-md flex items-center">
+
+        <button
+          onClick={handleOpenModal}
+          className="bg-primary text-white px-4 py-2 rounded-md flex items-center"
+        >
           <FaPlus className="mr-2" /> New Task
         </button>
       </div>
@@ -44,6 +84,7 @@ export default function TodosPage() {
             className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary text-white rounded"
           />
         </div>
+
         <div className="relative">
           <button
             onClick={() => setShowFilter(!showFilter)}
@@ -52,6 +93,7 @@ export default function TodosPage() {
             <LuSettings2 className="mr-2" /> Filter By
             <span className="ml-2">↑↓</span>
           </button>
+
           {showFilter && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
               <div className="p-4">
@@ -78,17 +120,31 @@ export default function TodosPage() {
         </div>
       </div>
 
-      {/* Empty State */}
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
-        <Image
-          src={todoEmptyState}
-          alt="No todos yet"
-          width={200}
-          height={200}
-          className="mb-4"
-        />
-        <p className="text-gray-500 text-lg">No todos yet</p>
-      </div>
+      {/* Todo Cards */}
+      {todos.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {todos.map((todo) => (
+            <TodoCard
+              key={todo.id}
+              title={todo.title}
+              description={todo.description}
+              todo_date={todo.todo_date}
+              priority={todo.priority}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+          <Image
+            src={todoEmptyState}
+            alt="No todos yet"
+            width={200}
+            height={200}
+            className="mb-4"
+          />
+          <p className="text-gray-500 text-lg">No todos yet</p>
+        </div>
+      )}
 
       <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>

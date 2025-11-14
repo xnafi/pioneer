@@ -1,6 +1,14 @@
-export interface UserInfo {
-  first_name: string;
-  last_name: string;
+export interface User {
+  id: string;
   email: string;
-  profile_image?: string;
+  name: string;
+  image: string;
+}
+
+export interface Todo {
+  id: string;
+  title: string;
+  description: string;
+  todo_date: string;
+  priority: 'extreme' | 'moderate' | 'low';
 }
