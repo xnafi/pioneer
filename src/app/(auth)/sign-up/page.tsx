@@ -42,8 +42,8 @@ export default function SignUp() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            firstName: data.firstName,
-            lastName: data.lastName,
+            firstName: data.first_name,
+            lastName: data.last_name,
             email: data.email,
             password: data.password,
           }),
@@ -102,15 +102,15 @@ export default function SignUp() {
                 First Name
               </label>
               <input
-                {...register("firstName")}
+                {...register("first_name")}
                 placeholder="John"
                 className={`mt-1 block w-full px-3 py-2 border placeholder-[#8CA3CD] ${
-                  errors.firstName ? "border-red-500" : "border-gray-300"
+                  errors.first_name ? "border-red-500" : "border-gray-300"
                 } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
               />
-              {errors.firstName && (
+              {errors.first_name && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.firstName.message}
+                  {errors.first_name.message}
                 </p>
               )}
             </div>
@@ -120,15 +120,15 @@ export default function SignUp() {
                 Last Name
               </label>
               <input
-                {...register("lastName")}
+                {...register("last_name")}
                 placeholder="Doe"
                 className={`mt-1 block w-full px-3 py-2 border placeholder-[#8CA3CD] ${
-                  errors.lastName ? "border-red-500" : "border-gray-300"
+                  errors.last_name ? "border-red-500" : "border-gray-300"
                 } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
               />
-              {errors.lastName && (
+              {errors.last_name && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.lastName.message}
+                  {errors.last_name.message}
                 </p>
               )}
             </div>

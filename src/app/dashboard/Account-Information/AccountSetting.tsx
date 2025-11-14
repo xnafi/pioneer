@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -10,38 +9,94 @@ import upload from "../../../assets/upload.svg";
 import uploadCamera from "../../../assets/camera-icon.svg";
 import Image from "next/image";
 import { useState } from "react";
+import Toast from "@/components/Toast";
 
 export default function AccountSetting() {
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3000); // Hide toast after 3 seconds
+  };
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<AccountInformationSchema>({
     resolver: zodResolver(accountInformationSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       email: "",
-      address: "",
-      contactNumber: "",
+      bio: "",
+      contact_number: "",
       birthday: "",
     },
   });
 
-  // Handle image upload
+  // image upload handler
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
       setProfilePreview(url);
+      setProfileFile(file);
     }
   };
 
-  const onSubmit = (data: AccountInformationSchema) => {
-    console.log(data);
-    alert("Saved successfully!");
+  // form submit handler
+  const onSubmit = async (data: AccountInformationSchema) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        showToast("User not authenticated!");
+        return;
+      }
+
+      // Prepare FormData
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value) formData.append(key, value as string);
+      });
+
+      if (profileFile) {
+        formData.append("profile_image", profileFile);
+      }
+
+      const res = await fetch(
+        "https://todo-app.pioneeralpha.com/api/users/me/",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        showToast(result.message || "Failed to update");
+        return;
+      }
+
+      // reset form with updated data
+      reset(result.data);
+      setProfilePreview(null);
+      setProfileFile(null);
+
+      showToast("Profile updated successfully!");
+    } catch (error) {
+      console.log(error);
+      showToast("Something went wrong!");
+    }
   };
 
   return (
@@ -51,7 +106,6 @@ export default function AccountSetting() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Profile Upload */}
         <div className="flex items-center space-x-4">
-          {/* Profile Image Preview */}
           <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
             {profilePreview ? (
               <Image
@@ -61,11 +115,15 @@ export default function AccountSetting() {
                 height={96}
               />
             ) : (
-                <Image src={uploadCamera} width={32} height={32} alt="camera-icon" />
+              <Image
+                src={uploadCamera}
+                width={32}
+                height={32}
+                alt="camera-icon"
+              />
             )}
           </div>
 
-          {/* Upload Button */}
           <label className="flex bg-primary px-4 py-2 rounded-md hover:bg-blue-800 text-white cursor-pointer space-x-2 w-[200px]">
             <Image src={upload} width={16} height={16} alt="upload-icon" />
             <span>Upload New Photo</span>
@@ -87,12 +145,12 @@ export default function AccountSetting() {
             </label>
             <input
               type="text"
-              {...register("firstName")}
+              {...register("first_name")}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             />
-            {errors.firstName && (
+            {errors.first_name && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.firstName.message}
+                {errors.first_name.message}
               </p>
             )}
           </div>
@@ -103,12 +161,12 @@ export default function AccountSetting() {
             </label>
             <input
               type="text"
-              {...register("lastName")}
+              {...register("last_name")}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             />
-            {errors.lastName && (
+            {errors.last_name && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.lastName.message}
+                {errors.last_name.message}
               </p>
             )}
           </div>
@@ -135,13 +193,11 @@ export default function AccountSetting() {
             </label>
             <input
               type="text"
-              {...register("address")}
+              {...register("bio")}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             />
-            {errors.address && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.address.message}
-              </p>
+            {errors.bio && (
+              <p className="text-red-500 text-xs mt-1">{errors.bio.message}</p>
             )}
           </div>
 
@@ -151,12 +207,12 @@ export default function AccountSetting() {
             </label>
             <input
               type="text"
-              {...register("contactNumber")}
+              {...register("contact_number")}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
             />
-            {errors.contactNumber && (
+            {errors.contact_number && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.contactNumber.message}
+                {errors.contact_number.message}
               </p>
             )}
           </div>
@@ -189,12 +245,14 @@ export default function AccountSetting() {
 
           <button
             type="button"
+            onClick={() => reset()} // reset to empty fields
             className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
           >
             Cancel
           </button>
         </div>
       </form>
+      {toastMessage && <Toast message={toastMessage} />}
     </div>
   );
 }

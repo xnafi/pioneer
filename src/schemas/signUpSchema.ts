@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const signUpSchema = z.object({
-  firstName: z
+  first_name: z
     .string()
     .min(1, "First Name is required.")
     .regex(/^[a-zA-Z\s]+$/, "Please enter a valid name format."),
-  lastName: z
+  last_name: z
     .string()
     .min(1, "Last Name is required.")
     .regex(/^[a-zA-Z\s]+$/, "Please enter a valid name format."),
