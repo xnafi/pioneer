@@ -35,6 +35,9 @@
 .dark-bg {
   background-color: var(--color-fg);
 }
+.bg-gray {
+  background-color: var(--color-gray);
+}
 
 .text-danger {
   color: var(--color-danger);

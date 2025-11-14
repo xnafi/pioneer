@@ -235,10 +235,10 @@ export default function AccountSetting() {
         </div>
 
         {/* Buttons */}
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-center space-x-4">
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-6 py-2 bg-primary text-white rounded-md hover:bg-blue-700"
           >
             Save Changes
           </button>
@@ -246,7 +246,7 @@ export default function AccountSetting() {
           <button
             type="button"
             onClick={() => reset()} // reset to empty fields
-            className="px-6 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+            className="px-6 py-2 bg-gray rounded-md hover:bg-gray-400 text-white"
           >
             Cancel
           </button>
