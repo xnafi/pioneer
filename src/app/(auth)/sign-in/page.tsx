@@ -17,7 +17,7 @@ export default function SignIn() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<IFormInput>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -43,7 +43,7 @@ export default function SignIn() {
       );
 
       const result = await res.json();
-
+      console.log(result);
       if (!res.ok) {
         setToastMsg(result.detail || "Login failed!");
         return;
@@ -163,7 +163,8 @@ export default function SignIn() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                disabled={!isValid || isSubmitting}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Log In
               </button>

@@ -59,11 +59,11 @@ export default function SignUp() {
 
       // Save token
       localStorage.setItem("auth_token", result.access);
-      setToastMsg("Login Successful!");
+      setToastMsg("Registration Successful! Login to continue.");
 
       setTimeout(() => {
-        router.push("/dashboard");
-      }, 1200);
+        router.push("/sign-in");
+      }, 3000);
     } catch (error) {
       console.error(error);
       setToastMsg("Something went wrong!");
