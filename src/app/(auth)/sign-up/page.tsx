@@ -71,12 +71,12 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex w-full bg-white flex-col lg:flex-row container mx-auto p-6">
+    <div className="min-h-screen flex w-full bg-white flex-col lg:flex-row mx-auto">
       {/* show toast message */}
       {toastMsg && <Toast message={toastMsg} />}
 
       {/* Left Side Illustration */}
-      <div className="w-full md:w-[600px] bg-secondary items-center justify-center flex p-6">
+      <div className="w-full md:w-[600px] bg-secondary items-center justify-center flex container">
         <Image
           src={signUpImage}
           alt="Sign Up Illustration"
