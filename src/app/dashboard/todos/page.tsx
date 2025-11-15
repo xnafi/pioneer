@@ -50,11 +50,11 @@ export default function TodosPage() {
       });
 
       const data = await res.json();
-      console.log("✅ Fetched todos:", data.results);
+      console.log("Fetched todos:", data.results);
       setTodos(data.results);
       setFilteredTodos(data.results); 
     } catch (error) {
-      console.error("❌ Error fetching todos:", error);
+      console.error("Error fetching todos:", error);
     }
   };
 

@@ -3,17 +3,9 @@ import Image from "next/image";
 import deleteIcon from "@/assets/delete2.svg";
 import dots from "@/assets/dots.svg";
 import editIcon from "@/assets/edit.svg";
-import { Todo } from "@/types/types";
+import { TodoCardProps } from "@/types/types";
 
-interface TodoCardProps {
-  id: number;
-  title: string;
-  description: string;
-  todo_date: string;
-  priority: "extreme" | "moderate" | "low";
-  onDelete: (id: number) => void;
-  onEdit: (todo: Todo) => void;
-}
+
 
 // Convert priority to UI label
 const formatPriority = (priority: string) => {

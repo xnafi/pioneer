@@ -21,12 +21,12 @@ interface AddTaskModalProps {
   editingTodo: Todo | null;
 }
 
-const AddTaskModal: React.FC<AddTaskModalProps> = ({
+function AddTaskModal({
   isOpen,
   onClose,
   onTaskAdded,
   editingTodo,
-}) => {
+}: AddTaskModalProps) {
   const [toastMsg, setToastMsg] = useState("");
   const {
     control,
@@ -61,50 +61,55 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     }
   }, [editingTodo, reset]);
 
-  // ✅ Send data to API
-  const onSubmit = async (data: AddTaskFormValues | EditTaskFormValues) => {
-    try {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        setToastMsg("User not authenticated!");
-        return;
+  function onSubmit(data: AddTaskFormValues | EditTaskFormValues) {
+    (async () => {
+      try {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+          setToastMsg("User not authenticated!");
+          return;
+        }
+        // method based on add or edit
+        const url = editingTodo
+          ? `${process.env.NEXT_PUBLIC_API_URL}/api/todos/${editingTodo.id}/`
+          : `${process.env.NEXT_PUBLIC_API_URL}/api/todos/`;
+        const method = editingTodo ? "PUT" : "POST";
+
+        const payload = editingTodo ? { ...data, is_completed: true } : data;
+
+        const res = await fetch(url, {
+          method: method,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+          setToastMsg(
+            result.message || `Failed to ${editingTodo ? "update" : "add"} task`
+          );
+          return;
+        }
+
+        setToastMsg(
+          `Task ${editingTodo ? "updated" : "created"} successfully!`
+        );
+        reset();
+        onTaskAdded();
+
+        setTimeout(() => {
+          setToastMsg("");
+          onClose();
+        }, 2000);
+      } catch (error) {
+        console.error(error);
+        setToastMsg("Something went wrong!");
       }
-
-      const url = editingTodo
-        ? `${process.env.NEXT_PUBLIC_API_URL}/api/todos/${editingTodo.id}/`
-        : `${process.env.NEXT_PUBLIC_API_URL}/api/todos/`;
-      const method = editingTodo ? "PUT" : "POST";
-
-      const payload = editingTodo ? { ...data, is_completed: true } : data;
-
-      const res = await fetch(url, {
-        method: method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await res.json();
-      if (!res.ok) {
-         reset();
-        setToastMsg(result.message || `Failed to ${editingTodo ? "update" : "add"} task`);
-        return;
-      }
-      setToastMsg(`Task ${editingTodo ? "updated" : "created"} successfully!`);
-      reset();
-      onTaskAdded();
-
-      setTimeout(() => {
-        setToastMsg("");
-        onClose();
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-      setToastMsg("Something went wrong!");
-    }
-  };
+    })();
+  }
 
   if (!isOpen) return null;
 
@@ -261,6 +266,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       </div>
     </div>
   );
-};
+}
 
 export default AddTaskModal;
