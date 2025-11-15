@@ -3,6 +3,7 @@ import Image from "next/image";
 import deleteIcon from "@/assets/delete2.svg";
 import dots from "@/assets/dots.svg";
 import editIcon from "@/assets/edit.svg";
+import { Todo } from "@/types/types";
 
 interface TodoCardProps {
   id: number;
@@ -11,6 +12,7 @@ interface TodoCardProps {
   todo_date: string;
   priority: "extreme" | "moderate" | "low";
   onDelete: (id: number) => void;
+  onEdit: (todo: Todo) => void;
 }
 
 // Convert priority to UI label
@@ -39,8 +41,13 @@ const TodoCard: React.FC<TodoCardProps> = ({
   todo_date,
   priority,
   onDelete,
+  onEdit,
 }) => {
   const priorityColorClass = getPriorityColor(priority);
+
+  const handleEditClick = () => {
+    onEdit({ id, title, description, todo_date, priority });
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md flex flex-col justify-between h-[180px] w-[380px]">
@@ -64,7 +71,10 @@ const TodoCard: React.FC<TodoCardProps> = ({
         <span className="text-gray-500">Due {todo_date}</span>
 
         <div className="flex space-x-2">
-          <button className="p-1 rounded-full hover:bg-gray-100">
+          <button
+            onClick={handleEditClick}
+            className="p-1 rounded-full hover:bg-gray-100"
+          >
             <Image src={editIcon} alt="Edit" width={32} height={32} />
           </button>
 

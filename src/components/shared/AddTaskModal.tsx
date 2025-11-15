@@ -1,22 +1,31 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addTaskSchema, AddTaskFormValues } from "../../schemas/addTaskSchema";
+import {
+  addTaskSchema,
+  AddTaskFormValues,
+  editTaskSchema,
+  EditTaskFormValues,
+} from "../../schemas/addTaskSchema";
 import deleteIcon from "../../assets/delete.svg";
 import Image from "next/image";
 import Toast from "@/components/Toast";
+
+import { Todo } from "@/types/types";
 
 interface AddTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   onTaskAdded: () => void;
+  editingTodo: Todo | null;
 }
 
 const AddTaskModal: React.FC<AddTaskModalProps> = ({
   isOpen,
   onClose,
   onTaskAdded,
+  editingTodo,
 }) => {
   const [toastMsg, setToastMsg] = useState("");
   const {
@@ -24,8 +33,8 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<AddTaskFormValues>({
-    resolver: zodResolver(addTaskSchema),
+  } = useForm<AddTaskFormValues | EditTaskFormValues>({
+    resolver: zodResolver(editingTodo ? editTaskSchema : addTaskSchema),
     defaultValues: {
       title: "",
       todo_date: "",
@@ -34,8 +43,26 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (editingTodo) {
+      reset({
+        title: editingTodo.title,
+        todo_date: editingTodo.todo_date,
+        priority: editingTodo.priority,
+        description: editingTodo.description,
+      });
+    } else {
+      reset({
+        title: "",
+        todo_date: "",
+        priority: undefined,
+        description: "",
+      });
+    }
+  }, [editingTodo, reset]);
+
   // ✅ Send data to API
-  const onSubmit = async (data: AddTaskFormValues) => {
+  const onSubmit = async (data: AddTaskFormValues | EditTaskFormValues) => {
     try {
       const token = localStorage.getItem("auth_token");
       if (!token) {
@@ -43,21 +70,29 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
         return;
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/todos/`, {
-        method: "POST",
+      const url = editingTodo
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/todos/${editingTodo.id}/`
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/todos/`;
+      const method = editingTodo ? "PUT" : "POST";
+
+      const payload = editingTodo ? { ...data, is_completed: true } : data;
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
       if (!res.ok) {
-        setToastMsg(result.message || "Failed to add task");
+         reset();
+        setToastMsg(result.message || `Failed to ${editingTodo ? "update" : "add"} task`);
         return;
       }
-      setToastMsg("Task created successfully!");
+      setToastMsg(`Task ${editingTodo ? "updated" : "created"} successfully!`);
       reset();
       onTaskAdded();
 
@@ -79,7 +114,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
       <div className="bg-white p-8 rounded-lg shadow-xl w-[519px] max-h-[90%] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold mb-2">Add New Task</h1>
+            <h1 className="text-2xl font-bold mb-2">
+              {editingTodo ? "Edit Task" : "Add New Task"}
+            </h1>
             <span className="border-t-3 border-[#5272FF] block mb-6 w-1/2"></span>
           </div>
 
@@ -135,39 +172,41 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
           </div>
 
           {/* PRIORITY */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Priority</label>
+          {!editingTodo && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Priority</label>
 
-            <div className="flex space-x-9 mt-2">
-              {["extreme", "moderate", "low"].map((option) => (
-                <label key={option} className="flex items-center space-x-2">
-                  <span className="bg-amber-700 rounded-md h-2 w-2 mt-1"></span>
-                  <span>{option}</span>
+              <div className="flex space-x-9 mt-2">
+                {["extreme", "moderate", "low"].map((option) => (
+                  <label key={option} className="flex items-center space-x-2">
+                    <span className="bg-amber-700 rounded-md h-2 w-2 mt-1"></span>
+                    <span>{option}</span>
 
-                  <Controller
-                    name="priority"
-                    control={control}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        type="radio"
-                        value={option}
-                        checked={field.value === option}
-                        onChange={() => field.onChange(option)}
-                        className="h-4 w-4 mt-1"
-                      />
-                    )}
-                  />
-                </label>
-              ))}
+                    <Controller
+                      name="priority"
+                      control={control}
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type="radio"
+                          value={option}
+                          checked={field.value === option}
+                          onChange={() => field.onChange(option)}
+                          className="h-4 w-4 mt-1"
+                        />
+                      )}
+                    />
+                  </label>
+                ))}
+              </div>
+
+              {errors.priority && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.priority.message}
+                </p>
+              )}
             </div>
-
-            {errors.priority && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.priority.message}
-              </p>
-            )}
-          </div>
+          )}
 
           {/* DESCRIPTION */}
           <div>
@@ -201,7 +240,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({
               type="submit"
               className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80"
             >
-              Done
+              {editingTodo ? "Update" : "Done"}
             </button>
 
             <button

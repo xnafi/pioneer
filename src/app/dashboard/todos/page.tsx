@@ -15,9 +15,13 @@ export default function TodosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTodo(null); // Clear editing todo when modal closes
+  };
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -76,6 +80,12 @@ export default function TodosPage() {
     } catch (error) {
       showToast(`❌ Error deleting todo: ${error}`);
     }
+  };
+
+  // Edit Todo
+  const handleEditTodo = (todo: Todo) => {
+    setEditingTodo(todo);
+    setIsModalOpen(true);
   };
 
   // Fetch on first load
@@ -169,6 +179,7 @@ export default function TodosPage() {
                 todo_date={todo.todo_date}
                 priority={todo.priority}
                 onDelete={handleDeleteTodo}
+                onEdit={handleEditTodo}
               />
             ))}
           </div>
@@ -186,7 +197,12 @@ export default function TodosPage() {
         </div>
       )}
 
-      <AddTaskModal isOpen={isModalOpen} onClose={handleCloseModal} onTaskAdded={fetchTodos} />
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onTaskAdded={fetchTodos}
+        editingTodo={editingTodo}
+      />
       {toastMessage && <Toast message={toastMessage} />}
     </div>
   );
