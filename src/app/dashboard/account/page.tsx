@@ -6,11 +6,11 @@ import {
   AccountInformationSchema,
 } from "@/schemas/accountInformationSchema";
 import upload from "../../../assets/upload.svg";
-import uploadCamera from "../../../assets/camera-icon.svg";
 import Image from "next/image";
 import { useState } from "react";
 import Toast from "@/components/Toast";
-import { Camera } from "lucide-react";
+import { CameraIcon } from "lucide-react";
+
 
 export default function AccountSetting() {
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
@@ -118,7 +118,7 @@ export default function AccountSetting() {
               />
             ) : (
                 <div className="bg-blue-400 p-1 rounded-full top-8 relative left-8">
-                 <Camera className="text-white" /> 
+                 <CameraIcon className="text-white" /> 
                 </div>
             )}
           </div>
