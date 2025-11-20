@@ -120,13 +120,6 @@ export default function AccountSetting() {
                 <div className="bg-blue-400 p-1 rounded-full top-8 relative left-8">
                  <Camera className="text-white" /> 
                 </div>
-              
-              // <Image
-              //   src={uploadCamera}
-              //   width={32}
-              //   height={32}
-              //   alt="camera-icon"
-              // />
             )}
           </div>
 

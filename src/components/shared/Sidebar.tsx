@@ -37,7 +37,7 @@ export default function Sidebar() {
 
         if (!res.ok) {
           localStorage.removeItem("auth_token");
-          window.location.href = "/sign-in ";
+          window.location.href = "/sign-in";
           return;
         }
 
@@ -60,6 +60,14 @@ export default function Sidebar() {
   const userName = user ? `${user.first_name} ${user.last_name}` : "Loading...";
   const userEmail = user?.email || "Loading...";
 
+  const linkClass = (path: string) =>
+    `flex items-center px-4 py-2 rounded-md transition-colors duration-150 ${
+      pathname === path
+        ? // Active style: soft left-to-right gradient + subtle glow (matches your screenshot)
+          "relative bg-gradient-to-r from-[#304A88]/80 to-[#1A2C50]/40 shadow-[0_0_20px_rgba(48,74,136,0.2)]"
+        : "hover:bg-[#2C426F]"
+    }`;
+
   return (
     <aside className="w-[280px] bg-[#1A2C50] text-white flex flex-col">
       <div className="p-4">
@@ -80,35 +88,23 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
-        <Link
-          href="/dashboard"
-          className={`flex items-center px-4 py-2 rounded-md ${
-            pathname === "/dashboard" ? "bg-[#2C426F]" : "hover:bg-[#2C426F]"
-          }`}
-        >
+        <Link href="/dashboard" className={linkClass("/dashboard")}>
           <Image
             src={dashboardIcon}
             width={24}
             height={24}
-            alt="Dashboard-icon"
+            alt="Dashboard icon"
             className="mr-3"
           />
           Dashboard
         </Link>
 
-        <Link
-          href="/dashboard/todos"
-          className={`flex items-center px-4 py-2 rounded-md ${
-            pathname === "/dashboard/todos"
-              ? "bg-[#2C426F]"
-              : "hover:bg-[#2C426F]"
-          }`}
-        >
+        <Link href="/dashboard/todos" className={linkClass("/dashboard/todos")}>
           <Image
             src={todoIcon}
             width={24}
             height={24}
-            alt="Todo-icon"
+            alt="Todos icon"
             className="mr-3"
           />
           Todos
@@ -116,17 +112,13 @@ export default function Sidebar() {
 
         <Link
           href="/dashboard/account"
-          className={`flex items-center px-4 py-2 rounded-md ${
-            pathname === "/dashboard/account"
-              ? "bg-[#2C426F]"
-              : "hover:bg-[#2C426F]"
-          }`}
+          className={linkClass("/dashboard/account")}
         >
           <Image
             src={userIcon}
             width={24}
             height={24}
-            alt="User-icon"
+            alt="Account icon"
             className="mr-3"
           />
           Account Information
@@ -142,7 +134,7 @@ export default function Sidebar() {
             src={logoutIcon}
             width={24}
             height={24}
-            alt="Logout-icon"
+            alt="Logout icon"
             className="mr-3"
           />
           Logout
