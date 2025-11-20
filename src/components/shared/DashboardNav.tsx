@@ -1,7 +1,7 @@
 import Image from "next/image";
 import logo from "../../assets/nav-logo.svg";
-import bell from "../../assets/bell-icon.png";
-import cal from "../../assets/Cal-icon.png";
+import bell from "../../assets/bell-icon.svg";
+import cal from "../../assets/Cal-icon.svg";
 
 export default function DashboardNav() {
   // Generate dynamic date

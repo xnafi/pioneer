@@ -10,6 +10,7 @@ import uploadCamera from "../../../assets/camera-icon.svg";
 import Image from "next/image";
 import { useState } from "react";
 import Toast from "@/components/Toast";
+import { Camera } from "lucide-react";
 
 export default function AccountSetting() {
   const [profilePreview, setProfilePreview] = useState<string | null>(null);
@@ -107,7 +108,7 @@ export default function AccountSetting() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Profile Upload */}
         <div className="flex items-center space-x-4">
-          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
             {profilePreview ? (
               <Image
                 src={profilePreview}
@@ -116,12 +117,16 @@ export default function AccountSetting() {
                 height={96}
               />
             ) : (
-              <Image
-                src={uploadCamera}
-                width={32}
-                height={32}
-                alt="camera-icon"
-              />
+                <div className="bg-blue-400 p-1 rounded-full top-8 relative left-8">
+                 <Camera className="text-white" /> 
+                </div>
+              
+              // <Image
+              //   src={uploadCamera}
+              //   width={32}
+              //   height={32}
+              //   alt="camera-icon"
+              // />
             )}
           </div>
 
@@ -247,7 +252,7 @@ export default function AccountSetting() {
           <button
             type="button"
             onClick={() => reset()} // reset to empty fields
-            className="px-6 py-2 bg-gray rounded-md hover:bg-gray-400 text-white"
+            className="px-6 py-2 bg-[#8ba2cc] rounded-md hover:bg-gray-400 text-white"
           >
             Cancel
           </button>
